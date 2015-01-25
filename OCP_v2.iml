@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="Flex" version="4">
+  <component name="FlexBuildConfigurationManager" active="OCP_v2">
+    <configurations>
+      <configuration name="OCP_v2" pure-as="true" output-file="OCP_v2.swf" output-folder="$MODULE_DIR$/out/production/OCP_v2">
+        <dependencies target-player="11.1">
+          <entries>
+            <entry library-id="66c5b143-c494-4800-a97b-9a848bb85451">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="471b2938-63b4-4a89-a71b-7636af253276">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="4.6.0" />
+        </dependencies>
+        <compiler-options />
+        <packaging-air-desktop />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+    </configurations>
+    <compiler-options />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="4.6.0" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="alcon" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="66c5b143-c494-4800-a97b-9a848bb85451" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/alcon.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="471b2938-63b4-4a89-a71b-7636af253276" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/bulk_loader.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>
+
