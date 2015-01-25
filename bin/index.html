@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>OCP</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<style type="text/css" media="screen">
+		html, body { height:100%; background-color: #ffffff;}
+		body { margin:0; padding:0; overflow:hidden; font-family: Arial;  }
+		#flashContent { width:600px; height: 800px; float:left; }
+            #controls{ width: 400px; height: 800px; float:left; background-color: #cccccc; text-align: center; }
+            #steppers{ padding-top: .5em; margin-bottom: 20px; }
+            #steppers input{ background-color: #afafaf; width: 75px; text-align: center; vertical-align: middle; font-size: 2em; font-weight: bold; }
+            #trace{ width: 360px; height: 400px; background-color: #afafaf; }
+            #labels {  padding-top: 10px;}
+            #labels label{ width: 75px; text-align: center; padding: 0 2em; }
+            button{font-size: 2em; font-weight: bold; }
+            #clear{font-size: 1em; font-weight: bold; }
+            #xmlPath{ display: block; text-align: center; width: 50%; margin: 40px 100px; font-size: 15px; }
+            #traceLog{ display: block; font-size: 15px; margin-top: 1em; margin-bottom: .5em;  }
+
+            .alarms{ margin-top: 1em; }
+            .alarm{ font-size: 10px; background-color: #ff0000; }
+		</style>
+
+        <script src="js/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript">
+            var speed = 2000; // milisegundos entre pisos
+            var liftMoving = false;
+            var diffFloor = 0;
+            var intervalCounter = 0;
+            var itv = 0;
+            var currentLevel = 0;
+            var subiendo = false;
+
+            var xmlReady = true;
+            var alarmOn = false;
+            var xmlConfig = '<CONFIG><OCP ID="29"/><PLAYER_LOG FILE="player.log"/><VERSION FILE="349.xml"/><PUBLI FILE="270.par" HORA="00:00:00"/><DPE_STATS FILE="./stats"/><API AP="1043"/> <DATOS RUTA="."/><TICKER URL="http://www.innovaevision.es/desarrollo/orona/backend/api/xmlrpc/obtenertickericp.php?icp=" INTERVAL="1"/><RSS URL="http://www.innovaevision.es/desarrollo/orona/backend/api/xmlrpc/RSS_Cargar.php"/><PLAY_MODE val="1"/></CONFIG>'
+            var xmlData = '<?xml version="1.0" encoding = "UTF-8"?><VERSION nombre="" creado="" ultima_modificacion="" ><PLANTILLA id="0" nombre="orona_default" fuente="Verdana" size="19" color_textos="9944589" color_bordes="9944589" color_fondo="16777215" color_directorio_sup="9944589" color_directorio_inf="6250335" color_directorio_texto="6250335" velocidad="6" pisos_pagina="5"  estilo_directorio="default"  /><SUBIDA><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></SUBIDA><BAJADA><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></BAJADA><REPOSO><PISO id="0" showPosition="1" nombre="Piso 1" descripcion="\n" aditional_info="" showDirectory="true" ><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></PISO><PISO id="1" showPosition="2" nombre="Piso 2" descripcion="\n" aditional_info="" showDirectory="true" ><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></PISO><PISO id="2" showPosition="3" nombre="Piso 3" descripcion="\n" aditional_info="" showDirectory="true" ><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></PISO><PISO id="3" showPosition="4" nombre="Piso 4" descripcion="\n" aditional_info="" showDirectory="true" ><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></PISO><PISO id="4" showPosition="5" nombre="Piso 5" descripcion="\n" aditional_info="" showDirectory="true" ><AREA tipo="1" pathfondo="img1.jpg" ID="247"/><AREA tipo="2" pathfondo=""><ELEMENTO alto="1" ancho="1" tipo="swf" profundidad="1" transparencia="1" cY="0" cX="0" path="area2.swf"/></AREA><AREA tipo="3" pathfondo=""></AREA><AREA tipo="4" pathfondo=""></AREA></PISO></REPOSO></VERSION>';
+
+            function pageLoaded()
+            {
+                $('#fromFloor').val(0);
+            }
+
+            function xmlHasLoaded()
+            {
+                xmlReady = true;
+
+                $('#fromFloor').val(0);
+            }
+
+            function moveLift()
+            {
+                if(xmlReady)
+                {
+                    log("GO -------------------------", false);
+                    setDirection();
+                    if(!liftMoving && itv == 0)
+                    {
+                        currentLevel = $('#fromFloor').val();
+                        intervalCounter = 0;
+                        diffFloor = Math.abs($('#fromFloor').val() - $('#toFloor').val());
+                        liftMoving = true;
+                        itv = setInterval(nextFloor, speed);
+                    }
+                } else{
+                      log("XML no cargado", false);
+                }
+            }
+
+            function nextFloor()
+            {
+                log("nextFloor");
+               // if(!alarmOn)
+                //{
+                    if(subiendo)
+                    {
+                        ++currentLevel;
+                    }else{
+                        --currentLevel;
+                    }
+                    document.getElementById("flashOCP").SetLogicalPosition(currentLevel);
+                    document.getElementById("flashOCP").SetFloorString(currentLevel);
+                    intervalCounter++;
+                    $('#fromFloor').val(currentLevel);
+                    if(intervalCounter >= diffFloor)
+                    {
+                        document.getElementById("flashOCP").ShowFloor();
+                        setDirection();
+                        clearInterval(itv);
+                        itv = 0;
+                        liftMoving = false;
+                    }
+                //}
+            }
+
+            function setDirection()
+            {
+                if($('#toFloor').val() > $('#fromFloor').val() && !liftMoving)
+                {
+                    subiendo = true;
+                    document.getElementById("flashOCP").SetDirection(0);
+                    log("setDirection: SUBIENDO", true);
+                }
+                else if($('#toFloor').val() < $('#fromFloor').val() && !liftMoving)
+                {
+                    subiendo = false;
+                    document.getElementById("flashOCP").SetDirection(1);
+                    log("setDirection: BAJANDO", true);
+                }
+                else
+                {
+                    subiendo = false;
+                    setTimeout("setStopMode()", 2000);
+                }
+            }
+
+            function setStopMode()
+            {
+                log("setDirection: PARADO", true);
+                document.getElementById("flashOCP").SetDirection(3);
+            }
+
+            function setAlarm(num)
+            {
+                log("ALARM: "+num, true);
+                liftMoving = false;
+                alarmOn = num > 0;
+                clearInterval(itv);
+                itv = 0;
+                if(num == 0)
+                {
+                    document.getElementById("flashOCP").SetLogicalPosition(currentLevel);
+                    document.getElementById("flashOCP").SetFloorString(currentLevel);
+                }
+                document.getElementById("flashOCP").SetLiftState(num);
+            }
+
+            function log(text, maniobra)
+            {
+                if(maniobra)
+                {
+                    $('#trace').val($('#trace').val()+"[Maniobra] "+text+"\r\n");
+                }else{
+                    $('#trace').val($('#trace').val()+text+"\r\n");
+                }
+            }
+
+            function clearLog()
+            {
+                $('#trace').val('');
+            }
+
+            function injectXmlData(xml)
+            {
+               // xmlData = xml;
+            }
+
+            function getXmlData()
+            {
+                document.getElementById("flashOCP").setXMLData(xmlConfig, xmlData);
+            }
+
+            function customAlert(msg)
+            {
+                alert(msg);
+            }
+        </script>
+	</head>
+	<body onload="pageLoaded()">
+		<div id="flashContent">
+			<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="600" height="800" id="OCP" align="middle">
+				<param name="movie" value="PlayerVDAP.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#ffffff" />
+				<param name="play" value="true" />
+				<param name="loop" value="true" />
+				<param name="wmode" value="opaque" />
+				<param name="scale" value="showall" />
+				<param name="menu" value="false" />
+				<param name="devicefont" value="false" />
+				<param name="salign" value="" />
+				<param name="allowScriptAccess" value="always" />
+                <param name="flashVars" value="preview=1" />
+				<!--[if !IE]>-->
+				<object type="application/x-shockwave-flash" data="PlayerVDAP.swf" width="600" height="800" id="flashOCP">
+					<param name="movie" value="PlayerVDAP.swf" />
+					<param name="quality" value="high" />
+					<param name="bgcolor" value="#ffffff" />
+					<param name="play" value="true" />
+					<param name="loop" value="true" />
+					<param name="wmode" value="opaque" />
+					<param name="scale" value="showall" />
+					<param name="menu" value="false" />
+					<param name="devicefont" value="false" />
+					<param name="salign" value="" />
+					<param name="allowScriptAccess" value="always" />
+                    <param name="flashVars" value="preview=1" />
+				<!--<![endif]-->
+					<a href="http://www.adobe.com/go/getflash">
+						<img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" />
+					</a>
+				<!--[if !IE]>-->
+				</object>
+				<!--<![endif]-->
+			</object>
+		</div>
+
+    <div id="controls">
+        <h2>SIMULADOR DE MANIOBRA</h2>
+        <div id="labels">
+            <label for="fromFloor">From</label>
+            <label for="toFloor">To</label>
+        </div>
+        <div id="steppers">
+            <input id="fromFloor" maxlength="2" type="number">
+            <input id="toFloor" maxlength="2" type="number">
+        </div>
+        <button id="go" onclick="moveLift()">GO!</button>
+        <div class="alarms">
+            <label>Alarms:</label><br>
+            <button class="alarm" onclick="setAlarm(0)">reset</button>
+            <button class="alarm" onclick="setAlarm(1)">1</button>
+            <button class="alarm" onclick="setAlarm(2)">2</button>
+            <button class="alarm" onclick="setAlarm(3)">3</button>
+            <button class="alarm" onclick="setAlarm(4)">4</button>
+            <button class="alarm" onclick="setAlarm(5)">5</button>
+            <button class="alarm" onclick="setAlarm(6)">6</button>
+            <button class="alarm" onclick="setAlarm(7)">7</button>
+            <button class="alarm" onclick="setAlarm(8)">8</button>
+        </div>
+        <label id="traceLog" for="trace">Log:</label>
+        <textarea id="trace" type="text"></textarea>
+        <button id="clear" onclick="clearLog()">clear log</button>
+        <!--<input id="xmlPath" type="text" placeholder="XML file path">-->
+    </div>
+	</body>
+</html>
