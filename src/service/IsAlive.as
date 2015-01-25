@@ -6,7 +6,7 @@
 	
 	public class IsAlive {
 		
-		private const IS_ALIVE_URL:String = 'http://localhost/ocp/isAlive.php'; // url del php a llamar
+		private const IS_ALIVE_URL:String = 'http://localhost/isAlive.php'; // url del php a llamar
 		private const INTERVAL:int = 60000; // 60 segundos en milisegundos
 		
 		private var timer:Timer;
@@ -14,8 +14,6 @@
 		private var loader:URLLoader;
 
 		public function IsAlive() {
-			trace("IsAlive");
-			
 			timer = new Timer(INTERVAL);
 			timer.addEventListener(TimerEvent.TIMER, handle_timerEvent);
 			timer.start();

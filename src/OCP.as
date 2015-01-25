@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Clase principal del player (OCP).
  *
  * @author: fer : 31/03/14 - 13:01
@@ -25,6 +25,7 @@ import service.LiftGateway;
 import service.LiftGatewayEvent;
 
 import utils.XMLData;
+import service.IsAlive;
 
 public class OCP extends MovieClip
 {
@@ -69,6 +70,8 @@ public class OCP extends MovieClip
 
         liftGateway = new LiftGateway();
         liftGateway.addEventListener(LiftGatewayEvent.READY, handle_liftReady);
+		
+		var isAlive:IsAlive = new IsAlive();
     }
 
     private function handle_clearLogClick(event:MouseEvent):void

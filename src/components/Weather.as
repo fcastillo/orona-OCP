@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Componente meteorológico.
  *
  * @extends AbstractComponent
@@ -16,10 +16,9 @@ import flash.display.Sprite;
 import flash.events.TimerEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
 import flash.utils.Timer;
 import flash.utils.getDefinitionByName;
-
-import flashx.textLayout.formats.TextAlign;
 
 import utils.DateUtils;
 import utils.StringUtils;
@@ -110,7 +109,7 @@ public class Weather extends AbstractComponent implements IComponent
         // fecha
         var dateFormat:TextFormat = new TextFormat();
         dateFormat.size = 15;
-        dateFormat.align = TextAlign.CENTER;
+        dateFormat.align = TextFormatAlign.CENTER;
         dateFormat.bold = data.@fecha_negrita == "true";
         dateFormat.color = parseInt(data.@fecha_color);
         dateFormat.font = StringUtils.formatFontName(data.@fecha_fuente);
@@ -118,7 +117,7 @@ public class Weather extends AbstractComponent implements IComponent
         // temperatura
         var tempFormat:TextFormat = new TextFormat();
         tempFormat.size = 15;
-        tempFormat.align = TextAlign.CENTER;
+        tempFormat.align = TextFormatAlign.CENTER;
         tempFormat.bold = data.@temp_negrita == "true";
         tempFormat.color = parseInt(data.@temp_color);
         tempFormat.font = StringUtils.formatFontName(data.@temp_fuente);

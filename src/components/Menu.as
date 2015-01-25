@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Componente de menú.
  *
  * @author: fer : 22/04/14 - 13:23
@@ -34,10 +34,8 @@ import flash.geom.ColorTransform;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 import flash.utils.getDefinitionByName;
-
-import flashx.textLayout.formats.TextAlign;
-
 import utils.StringUtils;
 
 public class Menu extends AbstractComponent implements IComponent
@@ -191,14 +189,14 @@ public class Menu extends AbstractComponent implements IComponent
         switch(StringUtils.trim(align))
         {
             case "right":
-                result = TextAlign.RIGHT;
+                result = TextFormatAlign.RIGHT;
                 break;
             case "center":
-                result = TextAlign.CENTER;
+                result = TextFormatAlign.CENTER;
                 break;
             case "left":
             default :
-                result = TextAlign.LEFT;
+                result = TextFormatAlign.LEFT;
                 break;
         }
         return result;
